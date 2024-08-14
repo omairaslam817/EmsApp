@@ -22,7 +22,7 @@ public sealed class MembersController : ApiController
     {
     }
 
-    [HasPermission(Permission.ReadMember)] //Idea => Which memeber has which permission,how we are going to do this,we r going to define Roles,that will be Assign to members,For each role we are going to configure,which permission that role has.
+    [HasPermission(Permission.ReadMember)] //Idea =>  Which memeber has which permission,how we are going to do this,we r going to define Roles,that will be Assign to members,For each role we are going to configure,which permission that role has.
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetMemberById(Guid id, CancellationToken cancellationToken)
     {
