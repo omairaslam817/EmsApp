@@ -1,0 +1,10 @@
+<mat-card>
+    <mat-card-header>
+      <mat-card-title>Upload Expenses</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <input type="file" (change)="onFileSelected($event)" />
+      <button mat-raised-button color="primary" (click)="onUpload()">Upload</button>
+    </mat-card-content>
+  </mat-card>
+  

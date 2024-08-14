@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <h4 class="modal-title">Edit Expense</h4>
+  <!-- <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button> -->
+</div>
+
+
+<div class="modal-body">
+  <form [formGroup]="expenseForm">
+      <div class="form-group">
+          <label for="transactionDate">Transaction Date</label>
+          <input type="date" id="transactionDate" formControlName="transactionDate" class="form-control">
+      </div>
+      <div class="form-group">
+          <label for="transactionNumber">Transaction Number</label>
+          <input type="text" id="transactionNumber" formControlName="transactionNumber" class="form-control">
+      </div>
+      <div class="form-group">
+          <label for="transactionDetails">Transaction Details</label>
+          <input type="text" id="transactionDetails" formControlName="transactionDetails" class="form-control">
+      </div>
+      <div class="form-group">
+          <label for="transactionAmount">Transaction Amount</label>
+          <input type="number" id="transactionAmount" formControlName="transactionAmount" class="form-control">
+      </div>
+      <div class="form-group">
+          <label for="balance">Balance</label>
+          <input type="number" id="balance" formControlName="balance" class="form-control">
+      </div>
+  </form>
+</div>
+<div class="modal-footer">
+
+  <button type="submit" class="btn btn-outline-dark" [disabled]="!expenseForm.dirty || !expenseForm.valid" (click)="onSubmit()">Save</button>
+  <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+
+</div>
+
+
+
+

@@ -1,0 +1,6 @@
+@Ems.WebApi.Server_HostAddress = http://localhost:5010
+
+GET {{Ems.WebApi.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
