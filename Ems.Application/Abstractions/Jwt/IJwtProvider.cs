@@ -9,6 +9,6 @@ namespace Ems.Application.Abstractions.Jwt
 {
     public interface IJwtProvider
     {
-        string Generate(Member member);
+        Task<string> GenerateAsync(Member member);
     }
 }

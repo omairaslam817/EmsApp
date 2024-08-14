@@ -38,7 +38,7 @@ namespace Ems.Application.Login
                 return Result.Failure<string>(DomainErrors.Member.InvalidCredentials); //return same error in case of Password mismatch
             }
             //create jwt 
-            string token = _jwtProvider.Generate(member);
+            string token = await _jwtProvider.GenerateAsync(member);
             //return jwt
             return token;
         }
