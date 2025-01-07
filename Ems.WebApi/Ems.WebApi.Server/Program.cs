@@ -3,6 +3,7 @@ using Ems.Application.AutoMapper;
 using Ems.Application.Behaviors;
 using Ems.Domain.Interfaces;
 using Ems.Domain.Repositories;
+using Ems.Infrastructure.Authorization;
 using Ems.Infrastructure.Authrization;
 using Ems.Persistence;
 using Ems.Persistence.Interceptors;
@@ -69,8 +70,18 @@ builder.Services.AddAuthorization(options =>
 {
     // Configure authorization policies if needed
 });
+// Add memory cache
+builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthrizationHandler>();
+// Add distributed cache (e.g., Redis)
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379"; // Adjust with your Redis server configuration
+    options.InstanceName = "EmsCache_";
+});
+
+// Register the handler
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthrizationPolicyProvider>();
 
 // Build the application
