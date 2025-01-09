@@ -7,8 +7,10 @@ using Ems.Presentation.Contracts.Members;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Ems.Application.Login;
 using System.Net;
+using System.Text.Json;
 using Ems.Infrastructure.Authentication;
 using Ems.Domain.Enums;
 
@@ -17,20 +19,56 @@ namespace Gatherly.Presentation.Controllers;
 [Route("api/members")]
 public sealed class MembersController : ApiController
 {
-    public MembersController(ISender sender)
+    private readonly IDistributedCache _cache;
+
+    public MembersController(ISender sender, IDistributedCache cache)
         : base(sender)
     {
+        _cache = cache;
     }
 
-    [HasPermission(Permission.ReadMember)] //Idea =>  Which memeber has which permission,how we are going to do this,we r going to define Roles,that will be Assign to members,For each role we are going to configure,which permission that role has.
+    //[HasPermission(Permission.ReadMember)]
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetMemberById(Guid id, CancellationToken cancellationToken)
     {
-        var query = new GetMemberByIdQuery(id);
+        try
+        {
+            const string cachePrefix = "Member_";
+            string cacheKey = $"{cachePrefix}{id}";
 
-        Result<MemberResponse> response = await Sender.Send(query, cancellationToken);
+            // Try to retrieve the data from the cache
+            var cachedMember = await _cache.GetStringAsync(cacheKey,cancellationToken);
+            if (!string.IsNullOrEmpty(cachedMember))
+            {
+                // Deserialize and return cached data
+                var cachedResponse = JsonSerializer.Deserialize<MemberResponse>(cachedMember);
+                return Ok(cachedResponse);
+            }
 
-        return response.IsSuccess ? Ok(response.Value) : NotFound(response.Error);
+            // If not cached, retrieve data from the query handler
+            var query = new GetMemberByIdQuery(id);
+            Result<MemberResponse> response = await Sender.Send(query, cancellationToken);
+
+            if (!response.IsSuccess)
+            {
+                return NotFound(response.Error);
+            }
+
+            // Cache the response with an expiration time
+            var cacheEntryOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Adjust cache duration as needed
+            };
+            var serializedResponse = JsonSerializer.Serialize(response.Value);
+            await _cache.SetStringAsync(cacheKey, serializedResponse, cacheEntryOptions);
+
+            return Ok(response.Value);
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
     }
 
     [HttpPost("login")]
@@ -68,7 +106,7 @@ public sealed class MembersController : ApiController
         {
             return HandleFailure(result);
         }
-        
+
         return CreatedAtAction(
             nameof(GetMemberById),
             new { id = result.Value },

@@ -17,12 +17,11 @@ namespace Ems.Presentation.Controllers
 
     public sealed class AuthController : ApiController
     {
-        private readonly ClaimsPrincipal user;
 
-        public AuthController(ISender sender, ClaimsPrincipal user)
+        public AuthController(ISender sender)
        : base(sender)
         {
-            this.user = user;
+            //this.user = user;
         }
 
         [Authorize]
@@ -31,7 +30,7 @@ namespace Ems.Presentation.Controllers
         {
 
 
-            return Ok($"Hello{user.Identity.Name}!");
+            return Ok($"Hello{User.Identity.Name}!");
         }
     }
 }
